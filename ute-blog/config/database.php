@@ -116,7 +116,7 @@ return [
         'mongodb' => [
             'driver' => 'mongodb',
             'dsn' => env('DB_DSN'), 
-            'database' => 'ute_blog_db',
+            'database' => env('DB_DATABASE', 'ute_blog_db'),
         ],
 
     ],

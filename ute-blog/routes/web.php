@@ -2,7 +2,7 @@
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test_db', function () {
+Route::get('/test_database', function () {
     try {
         // Thử ping đến database
         $connection = DB::connection('mongodb');
