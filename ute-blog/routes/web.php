@@ -29,6 +29,7 @@ Route::get('/test_database', function () {
 });
 
 // Authentication Routes (Guest only)
+// Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -38,6 +39,8 @@ Route::middleware('guest')->group(function () {
 });
 
 // Authenticated Routes
+});
+
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
@@ -51,4 +54,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::resource('users', UserController::class);
     Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
     Route::post('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
+// Admin Routes (will be added in next phase)
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
 });
