@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\PostController;
 use App\Http\Controllers\Frontend\DepartmentController;
+use App\Http\Controllers\Frontend\SearchController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,10 @@ Route::get('/bai-viet/{slug}', [PostController::class, 'show'])->name('post.show
 // Departments
 Route::get('/don-vi', [DepartmentController::class, 'index'])->name('departments');
 Route::get('/don-vi/{slug}', [DepartmentController::class, 'show'])->name('department.show');
+
+// Search
+Route::get('/tim-kiem', [SearchController::class, 'index'])->name('search');
+Route::get('/api/search/autocomplete', [SearchController::class, 'autocomplete'])->name('search.autocomplete');
 
 // Static Pages (placeholder)
 Route::get('/gioi-thieu', function () {
