@@ -208,7 +208,7 @@
                 <div>
                     <h3 class="font-bold text-lg mb-4">Liên hệ</h3>
                     <p class="text-gray-400">Email: contact@ute.udn.vn</p>
-                    <p class="text-gray-400">Điện thoại: (0236) 3894 xxx</p>
+                    <p class="text-gray-400">Điện thoại: 0236 3894 123</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-lg mb-4">Kết nối</h3>
@@ -219,7 +219,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; {{ date('Y') }} UTE Blog. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} UTE Blog</p>
             </div>
         </div>
     </footer>

@@ -25,6 +25,11 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
+        // Filter by department
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+
         // Search by name, email, or user_code
         if ($request->filled('search')) {
             $search = $request->search;
@@ -36,8 +41,9 @@ class UserController extends Controller
         }
 
         $users = $query->orderBy('created_at', 'desc')->paginate(15);
+        $departments = \App\Models\Department::orderBy('name')->get();
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'departments'));
     }
 
     /**
@@ -45,7 +51,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create');
+        $departments = \App\Models\Department::orderBy('name')->get();
+        return view('admin.users.create', compact('departments'));
     }
 
     /**
@@ -60,6 +67,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'role' => 'required|in:admin,content_manager,member',
             'status' => 'required|in:active,inactive,pending',
+            'department_id' => 'nullable|string',
         ]);
 
         User::create([
@@ -69,6 +77,7 @@ class UserController extends Controller
             'password' => $request->password,
             'role' => $request->role,
             'status' => $request->status,
+            'department_id' => $request->department_id,
         ]);
 
         return redirect()->route('admin.users.index')
@@ -81,7 +90,8 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-        return view('admin.users.edit', compact('user'));
+        $departments = \App\Models\Department::orderBy('name')->get();
+        return view('admin.users.edit', compact('user', 'departments'));
     }
 
     /**
@@ -97,6 +107,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $id . ',_id',
             'role' => 'required|in:admin,content_manager,member',
             'status' => 'required|in:active,inactive,pending',
+            'department_id' => 'nullable|string',
         ]);
 
         $data = [
@@ -105,6 +116,7 @@ class UserController extends Controller
             'email' => strtolower(trim($request->email)),
             'role' => $request->role,
             'status' => $request->status,
+            'department_id' => $request->department_id,
         ];
 
         // Only update password if provided
@@ -159,5 +171,22 @@ class UserController extends Controller
         $user->update(['status' => User::STATUS_INACTIVE]);
 
         return back()->with('success', "Đã từ chối/khóa tài khoản của {$user->name}!");
+    }
+
+    /**
+     * Bulk approve pending users
+     */
+    public function bulkApprove(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'string',
+        ]);
+
+        $count = User::whereIn('_id', $request->user_ids)
+            ->update(['status' => User::STATUS_ACTIVE]);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', "Đã phê duyệt {$count} tài khoản!");
     }
 }
