@@ -63,18 +63,38 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// ===== ADMIN ROUTES =====
+// ===== SHARED ADMIN ROUTES (Both Admin & Content Manager) =====
+
+Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () {
+    // Dashboard - accessible by both Admin and Content Manager
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+});
+
+// ===== ADMIN ROUTES (Admin Only - User & Department Management) =====
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
-    // Dashboard
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
-    // User Management
+    // User Management (Admin Only)
     Route::resource('users', AdminUserController::class);
     Route::post('users/{user}/approve', [AdminUserController::class, 'approve'])->name('users.approve');
     Route::post('users/{user}/reject', [AdminUserController::class, 'reject'])->name('users.reject');
     Route::post('users/bulk-approve', [AdminUserController::class, 'bulkApprove'])->name('users.bulkApprove');
 
-    // Department Management
+    // Department Management (Admin Only)
     Route::resource('departments', AdminDepartmentController::class);
+});
+
+// ===== CONTENT MANAGER ROUTES (Content Manager ONLY - Posts & Events) =====
+
+Route::prefix('admin')->middleware(['auth', 'content_manager'])->name('admin.')->group(function () {
+    // Post Management (News & Events) - Content Manager ONLY
+    Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
+    Route::post('posts/{post}/publish', [\App\Http\Controllers\Admin\PostController::class, 'publish'])->name('posts.publish');
+    Route::post('posts/{post}/unpublish', [\App\Http\Controllers\Admin\PostController::class, 'unpublish'])->name('posts.unpublish');
+
+    // Image Upload for Posts
+    Route::post('images/upload', [\App\Http\Controllers\Admin\ImageUploadController::class, 'upload'])->name('images.upload');
+    Route::delete('images/delete', [\App\Http\Controllers\Admin\ImageUploadController::class, 'delete'])->name('images.delete');
+
+    // Category Management - Content Manager ONLY
+    // Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
 });

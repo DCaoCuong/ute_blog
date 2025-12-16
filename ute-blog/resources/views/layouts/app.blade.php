@@ -201,7 +201,7 @@
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
-                    <h3 class="font-bold text-lg mb-4">Trường ĐH Sư phạm Kỹ thuật</h3>
+                    <h3 class="font-bold text-lg mb-4">Trường Đại học Sư phạm Kỹ thuật</h3>
                     <p class="text-gray-400">Đại học Đà Nẵng</p>
                     <p class="text-gray-400 mt-2">Địa chỉ: 48 Cao Thắng, Đà Nẵng</p>
                 </div>

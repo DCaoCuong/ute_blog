@@ -114,6 +114,134 @@
                 {!! $post->content !!}
             </div>
 
+            <style>
+                /* Enhanced styling for post content */
+                .prose {
+                    color: #374151;
+                    line-height: 1.75;
+                }
+
+                .prose p {
+                    margin-bottom: 1.25rem;
+                    line-height: 1.75;
+                }
+
+                .prose h1,
+                .prose h2,
+                .prose h3,
+                .prose h4,
+                .prose h5,
+                .prose h6 {
+                    font-weight: 600;
+                    margin-top: 2rem;
+                    margin-bottom: 1rem;
+                    line-height: 1.3;
+                    color: #111827;
+                }
+
+                .prose h1 {
+                    font-size: 2.25rem;
+                }
+
+                .prose h2 {
+                    font-size: 1.875rem;
+                }
+
+                .prose h3 {
+                    font-size: 1.5rem;
+                }
+
+                .prose h4 {
+                    font-size: 1.25rem;
+                }
+
+                .prose img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 0.5rem;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    margin: 2rem auto;
+                    display: block;
+                }
+
+                .prose ul,
+                .prose ol {
+                    margin: 1.25rem 0;
+                    padding-left: 1.75rem;
+                }
+
+                .prose li {
+                    margin: 0.5rem 0;
+                }
+
+                .prose a {
+                    color: #2563eb;
+                    text-decoration: underline;
+                }
+
+                .prose a:hover {
+                    color: #1d4ed8;
+                }
+
+                .prose strong {
+                    font-weight: 600;
+                    color: #111827;
+                }
+
+                .prose em {
+                    font-style: italic;
+                }
+
+                .prose blockquote {
+                    border-left: 4px solid #e5e7eb;
+                    padding-left: 1rem;
+                    margin: 1.5rem 0;
+                    font-style: italic;
+                    color: #6b7280;
+                }
+
+                .prose code {
+                    background: #f3f4f6;
+                    padding: 0.2rem 0.4rem;
+                    border-radius: 0.25rem;
+                    font-size: 0.875em;
+                    font-family: 'Courier New', monospace;
+                }
+
+                .prose pre {
+                    background: #1f2937;
+                    color: #f9fafb;
+                    padding: 1rem;
+                    border-radius: 0.5rem;
+                    overflow-x: auto;
+                    margin: 1.5rem 0;
+                }
+
+                .prose table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 1.5rem 0;
+                }
+
+                .prose th,
+                .prose td {
+                    border: 1px solid #e5e7eb;
+                    padding: 0.75rem;
+                    text-align: left;
+                }
+
+                .prose th {
+                    background: #f9fafb;
+                    font-weight: 600;
+                }
+
+                /* Preserve whitespace and line breaks */
+                .prose {
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                }
+            </style>
+
             <!-- Tags -->
             @if($post->tags && count($post->tags) > 0)
                 <div class="mt-8 pt-6 border-t border-gray-200">

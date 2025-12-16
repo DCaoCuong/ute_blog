@@ -91,7 +91,7 @@
                         <input type="text" id="slug" name="slug" value="{{ old('slug') }}" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-gray-50"
                             placeholder="khoa-cntt">
-                        <p class="mt-1.5 text-xs text-gray-500">🔗 Auto-generate từ tên đơn vị</p>
+                        <p class="mt-1.5 text-xs text-gray-500">🔗 Tự động tạo từ tên đơn vị</p>
                         @error('slug')
                             <p class="mt-2 text-sm text-red-600 flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
