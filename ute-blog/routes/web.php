@@ -3,6 +3,9 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\PostController;
+use App\Http\Controllers\Frontend\DepartmentController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -12,10 +15,28 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Public Routes
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+// ===== PUBLIC ROUTES =====
+
+// Homepage
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// News
+Route::get('/tin-tuc', [PostController::class, 'news'])->name('news');
+
+// Events  
+Route::get('/su-kien', [PostController::class, 'events'])->name('events');
+
+// Single Post
+Route::get('/bai-viet/{slug}', [PostController::class, 'show'])->name('post.show');
+
+// Departments
+Route::get('/don-vi', [DepartmentController::class, 'index'])->name('departments');
+Route::get('/don-vi/{slug}', [DepartmentController::class, 'show'])->name('department.show');
+
+// Static Pages (placeholder)
+Route::get('/gioi-thieu', function () {
+    return view('frontend.pages.about');
+})->name('page.about');
 
 // Test MongoDB connection
 Route::get('/test_database', function () {
@@ -28,8 +49,8 @@ Route::get('/test_database', function () {
     }
 });
 
-// Authentication Routes (Guest only)
-// Authentication Routes
+// ===== AUTHENTICATION ROUTES =====
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -38,14 +59,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/register/success', [AuthController::class, 'registerSuccess'])->name('register.success');
 });
 
-// Authenticated Routes
-});
-
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Admin Routes
+// ===== ADMIN ROUTES =====
+
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -54,9 +73,4 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::resource('users', UserController::class);
     Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
     Route::post('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
-// Admin Routes (will be added in next phase)
-Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
 });

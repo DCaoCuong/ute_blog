@@ -50,7 +50,7 @@
                             <a href="#">Tiêu đề bài viết mẫu số {{ $i }}</a>
                         </h3>
                         <p class="text-gray-600 mt-2 text-sm line-clamp-2">
-                            Đây là nội dung tóm tắt của bài viết. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                            Đây là nội dung tóm tắt của bài viết. Đây là nội dung tóm tắt của bài viết.
                         </p>
                         <div class="flex items-center mt-4 text-sm text-gray-500">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
