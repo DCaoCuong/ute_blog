@@ -14,12 +14,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('cache', function (Blueprint $collection) {
-            $collection->index('key');
-        });
-
-        Schema::create('cache_locks', function (Blueprint $collection) {
-            $collection->index('key');
+        Schema::create('notifications', function (Blueprint $collection) {
+            $collection->index('notifiable_id');
         });
     }
 
@@ -28,7 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::drop('cache');
-        Schema::drop('cache_locks');
+        Schema::drop('notifications');
     }
 };
