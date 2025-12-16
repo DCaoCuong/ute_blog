@@ -51,6 +51,6 @@ class AdminSeeder extends Seeder
         $this->command->info('✅ Created admin users:');
         $this->command->info('   📧 admin@ute.udn.vn / Admin@123');
         $this->command->info('   📧 cm@ute.udn.vn / Cm@12345');
-        $this->command->info('   📧 sv001@ute.udn.vn / Student@123 (pending)');
+        $this->command->info('   📧 sv001@ute.udn.vn / Student@123');
     }
 }

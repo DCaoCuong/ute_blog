@@ -10,6 +10,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Quill Rich Text Editor (Free, No API Key) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,6 +53,7 @@
 
             <!-- Navigation -->
             <nav class="flex-1 p-4 space-y-2">
+                <!-- Dashboard - Everyone -->
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-700' : '' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,34 +64,52 @@
                     <span x-show="sidebarOpen">Dashboard</span>
                 </a>
 
-                <a href="{{ route('admin.users.index') }}"
-                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700' : '' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                        </path>
-                    </svg>
-                    <span x-show="sidebarOpen">Người dùng</span>
-                </a>
+                @if(auth()->user()->isContentManager())
+                    <!-- Content Management Section - Content Manager ONLY -->
+                    <div class="pt-4" x-show="sidebarOpen">
+                        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Quản lý Nội dung</p>
+                    </div>
 
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 text-gray-400">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
-                        </path>
-                    </svg>
-                    <span x-show="sidebarOpen">Bài viết</span>
-                </a>
+                    <!-- Posts - Content Manager ONLY -->
+                    <a href="{{ route('admin.posts.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.posts.*') ? 'bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                            </path>
+                        </svg>
+                        <span x-show="sidebarOpen">Bài viết & Sự kiện</span>
+                    </a>
+                @endif
 
-                <a href="{{ route('admin.departments.index') }}"
-                    class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.departments.*') ? 'bg-gray-700' : '' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                        </path>
-                    </svg>
-                    <span x-show="sidebarOpen">Khoa / Phòng</span>
-                </a>
+                @if(auth()->user()->isAdmin())
+                    <!-- Admin Management Section - Admin ONLY -->
+                    <div class="pt-4" x-show="sidebarOpen">
+                        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Quản trị Hệ thống</p>
+                    </div>
+
+                    <!-- Users - Admin ONLY -->
+                    <a href="{{ route('admin.users.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.users.*') ? 'bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+                            </path>
+                        </svg>
+                        <span x-show="sidebarOpen">Người dùng</span>
+                    </a>
+
+                    <!-- Departments - Admin ONLY -->
+                    <a href="{{ route('admin.departments.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-700 {{ request()->routeIs('admin.departments.*') ? 'bg-gray-700' : '' }}">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                        <span x-show="sidebarOpen">Đơn vị / Khoa</span>
+                    </a>
+                @endif
             </nav>
 
             <!-- Toggle Button -->

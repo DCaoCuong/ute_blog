@@ -6,11 +6,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class ContentManagerMiddleware
 {
     /**
      * Handle an incoming request.
-     * Admin-only access for user/department management
+     * Content Manager ONLY - for post/event management
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -20,8 +20,9 @@ class AdminMiddleware
 
         $user = auth()->user();
 
-        if (!$user->isAdmin()) {
-            abort(403, 'Bạn không có quyền truy cập khu vực quản trị. Chỉ Admin mới được phép.');
+        // Only Content Manager can access (NOT Admin)
+        if (!$user->isContentManager()) {
+            abort(403, 'Bạn không có quyền truy cập khu vực quản lý nội dung. Chỉ Content Manager mới được phép.');
         }
 
         return $next($request);
