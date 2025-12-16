@@ -45,10 +45,16 @@ class AuthController extends Controller
             ]);
         }
 
-        // Check if user is active
-        if ($user->status !== User::STATUS_ACTIVE) {
+        // Check user status
+        if ($user->status === User::STATUS_PENDING) {
             throw ValidationException::withMessages([
-                'login' => ['Tài khoản của bạn chưa được kích hoạt hoặc đã bị khóa.'],
+                'login' => ['Tài khoản của bạn đang chờ Admin phê duyệt. Vui lòng đợi hoặc liên hệ quản trị viên.'],
+            ]);
+        }
+
+        if ($user->status === User::STATUS_INACTIVE) {
+            throw ValidationException::withMessages([
+                'login' => ['Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.'],
             ]);
         }
 
@@ -78,7 +84,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Show registration form (for demo purposes)
+     * Show registration form
      */
     public function showRegister()
     {
@@ -87,6 +93,7 @@ class AuthController extends Controller
 
     /**
      * Handle registration request
+     * New users will have 'pending' status and require admin approval
      */
     public function register(Request $request)
     {
@@ -95,19 +102,37 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'user_code.required' => 'Vui lòng nhập MSSV hoặc MSGV.',
+            'user_code.unique' => 'MSSV/MSGV này đã được đăng ký.',
+            'name.required' => 'Vui lòng nhập họ và tên.',
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.unique' => 'Email này đã được đăng ký.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
         ]);
 
+        // Create user with PENDING status - requires admin approval
         $user = User::create([
-            'user_code' => $request->input('user_code'),
+            'user_code' => strtoupper(trim($request->input('user_code'))),
             'name' => $request->input('name'),
-            'email' => $request->input('email'),
+            'email' => strtolower(trim($request->input('email'))),
             'password' => $request->input('password'),
             'role' => User::ROLE_MEMBER,
-            'status' => User::STATUS_ACTIVE,
+            'status' => User::STATUS_PENDING, // Requires admin approval
         ]);
 
-        Auth::login($user);
+        // Redirect to registration success page (not logged in yet)
+        return redirect()->route('register.success');
+    }
 
-        return redirect('/');
+    /**
+     * Show registration success page
+     */
+    public function registerSuccess()
+    {
+        return view('auth.register-success');
     }
 }
