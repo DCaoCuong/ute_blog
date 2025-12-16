@@ -15,7 +15,7 @@
                     Đăng nhập
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">
-                    Sử dụng MSSV/MSGV hoặc Email để đăng nhập
+                    Sử dụng MSSV/MSGV để đăng nhập
                 </p>
             </div>
 
@@ -24,10 +24,10 @@
                 <form class="space-y-6" method="POST" action="/login">
                     @csrf
 
-                    <!-- Login Field (Email or MSSV/MSGV) -->
+                    <!-- Login Field (MSSV/MSGV) -->
                     <div>
                         <label for="login" class="block text-sm font-medium text-gray-700">
-                            MSSV / MSGV / Email
+                            MSSV / MSGV
                         </label>
                         <div class="mt-1">
                             <input id="login" name="login" type="text" required autofocus value="{{ old('login') }}"

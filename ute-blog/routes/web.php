@@ -2,19 +2,14 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\DepartmentController as AdminDepartmentController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\PostController;
 use App\Http\Controllers\Frontend\DepartmentController;
 use App\Http\Controllers\Frontend\SearchController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes - UTE Blog
-|--------------------------------------------------------------------------
-*/
 
 // ===== PUBLIC ROUTES =====
 
@@ -24,7 +19,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // News
 Route::get('/tin-tuc', [PostController::class, 'news'])->name('news');
 
-// Events  
+// Events
 Route::get('/su-kien', [PostController::class, 'events'])->name('events');
 
 // Single Post
@@ -43,16 +38,16 @@ Route::get('/gioi-thieu', function () {
     return view('frontend.pages.about');
 })->name('page.about');
 
-// Test MongoDB connection
-Route::get('/test_database', function () {
-    try {
-        $connection = DB::connection('mongodb');
-        $msg = "Kết nối MongoDB thành công! Database: " . $connection->getDatabaseName();
-        return $msg;
-    } catch (\Exception $e) {
-        return "Lỗi kết nối: " . $e->getMessage();
-    }
-});
+// // Test MongoDB connection
+// Route::get('/test_database', function () {
+//     try {
+//         $connection = DB::connection('mongodb');
+//         $msg = "Kết nối MongoDB thành công! Database: " . $connection->getDatabaseName();
+//         return $msg;
+//     } catch (\Exception $e) {
+//         return "Lỗi kết nối: " . $e->getMessage();
+//     }
+// });
 
 // ===== AUTHENTICATION ROUTES =====
 
@@ -75,7 +70,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // User Management
-    Route::resource('users', UserController::class);
-    Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
-    Route::post('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
+    Route::resource('users', AdminUserController::class);
+    Route::post('users/{user}/approve', [AdminUserController::class, 'approve'])->name('users.approve');
+    Route::post('users/{user}/reject', [AdminUserController::class, 'reject'])->name('users.reject');
+    Route::post('users/bulk-approve', [AdminUserController::class, 'bulkApprove'])->name('users.bulkApprove');
+
+    // Department Management
+    Route::resource('departments', AdminDepartmentController::class);
 });
