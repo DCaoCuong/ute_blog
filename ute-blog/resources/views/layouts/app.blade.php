@@ -10,13 +10,85 @@
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Google Fonts - Inter for modern, clean look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Custom styles -->
     <style>
+        /* Apply Inter font globally */
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Improve text rendering */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Enhanced typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Smooth transitions */
+        a,
+        button {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Hide elements with x-cloak */
         [x-cloak] {
             display: none !important;
+        }
+
+        /* Custom prose styles for content */
+        .prose {
+            line-height: 1.75;
+        }
+
+        .prose p {
+            margin-bottom: 1.25em;
+        }
+
+        .prose h2 {
+            margin-top: 2em;
+            margin-bottom: 1em;
+        }
+
+        /* Line clamp utilities */
+        .line-clamp-1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 
@@ -39,13 +111,42 @@
                     </div>
                 </a>
 
+                <!-- Search Box with Autocomplete -->
+                <div class="hidden md:block flex-1 max-w-md mx-6" x-data="searchAutocomplete()">
+                    <form action="{{ route('search') }}" method="GET" class="relative">
+                        <input type="text" name="q" x-model="query" @input.debounce.300ms="fetchSuggestions"
+                            @focus="showSuggestions = true" @keydown.escape="showSuggestions = false"
+                            placeholder="Tìm kiếm..."
+                            class="w-full px-4 py-2 pr-10 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <button type="submit"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Autocomplete Dropdown -->
+                        <div x-show="showSuggestions && suggestions.length > 0" @click.away="showSuggestions = false"
+                            x-cloak
+                            class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg py-2 z-50 max-h-96 overflow-y-auto">
+                            <template x-for="suggestion in suggestions" :key="suggestion.url">
+                                <a :href="suggestion.url" class="block px-4 py-2 hover:bg-gray-100 text-gray-800">
+                                    <div class="font-medium" x-text="suggestion.title"></div>
+                                    <div class="text-xs text-gray-500" x-text="suggestion.type"></div>
+                                </a>
+                            </template>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Navigation -->
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="/" class="hover:text-blue-200 transition">Trang chủ</a>
-                    <a href="/gioi-thieu" class="hover:text-blue-200 transition">Giới thiệu</a>
-                    <a href="/tin-tuc" class="hover:text-blue-200 transition">Tin tức</a>
-                    <a href="/su-kien" class="hover:text-blue-200 transition">Sự kiện</a>
-                    <a href="/khoa-phong" class="hover:text-blue-200 transition">Khoa - Phòng</a>
+                    <a href="{{ route('page.about') }}" class="hover:text-blue-200 transition">Giới thiệu</a>
+                    <a href="{{ route('news') }}" class="hover:text-blue-200 transition">Tin tức</a>
+                    <a href="{{ route('events') }}" class="hover:text-blue-200 transition">Sự kiện</a>
+                    <a href="{{ route('departments') }}" class="hover:text-blue-200 transition">Khoa - Phòng</a>
 
                     @auth
                         <div x-data="{ open: false }" class="relative">
@@ -122,6 +223,33 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function searchAutocomplete() {
+            return {
+                query: '',
+                suggestions: [],
+                showSuggestions: false,
+
+                fetchSuggestions() {
+                    if (this.query.length < 2) {
+                        this.suggestions = [];
+                        return;
+                    }
+
+                    fetch(`/api/search/autocomplete?q=${encodeURIComponent(this.query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.suggestions = data;
+                            this.showSuggestions = data.length > 0;
+                        })
+                        .catch(() => {
+                            this.suggestions = [];
+                        });
+                }
+            }
+        }
+    </script>
 
     @stack('scripts')
 </body>
