@@ -84,6 +84,10 @@ class PostController extends Controller
         $data = $request->all();
         $data['author_id'] = auth()->id();
 
+        // Handle checkbox fields (not sent when unchecked)
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_pinned'] = $request->boolean('is_pinned');
+
         // Decode images JSON string to array
         if ($request->filled('images')) {
             $data['images'] = json_decode($request->images, true);
@@ -136,6 +140,10 @@ class PostController extends Controller
         ]);
 
         $data = $request->all();
+
+        // Handle checkbox fields (not sent when unchecked)
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_pinned'] = $request->boolean('is_pinned');
 
         // Decode images JSON string to array
         if ($request->filled('images')) {

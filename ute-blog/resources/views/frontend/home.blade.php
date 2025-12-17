@@ -8,10 +8,9 @@
         <div class="container mx-auto px-4 py-16">
             <div class="max-w-3xl">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    Chào mừng đến với UTE
+                    Chào mừng đến với Trường Đại học Sư phạm Kỹ thuật
                 </h1>
                 <p class="text-xl text-blue-100 mb-8">
-                    Trường Đại học Sư phạm Kỹ thuật - Đại học Đà Nẵng.
                     Nơi đào tạo nguồn nhân lực chất lượng cao cho công nghiệp hóa, hiện đại hóa đất nước.
                 </p>
                 <div class="flex flex-wrap gap-4">
@@ -32,43 +31,126 @@
     @if($featuredPosts->count() > 0)
         <section class="py-12 container mx-auto px-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-8">Tin nổi bật</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach($featuredPosts as $post)
-                    <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition group">
-                        <div class="h-48 bg-gradient-to-br from-blue-100 to-blue-200 overflow-hidden">
-                            @if($post->thumbnail)
-                                <img src="{{ $post->thumbnail }}" alt="{{ $post->title }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-blue-400">
-                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
+
+            <!-- Carousel Container -->
+            <div class="relative" x-data="featuredCarousel()" x-init="init()">
+                <!-- Slides -->
+                <div class="overflow-hidden">
+                    <div class="flex transition-transform duration-500 ease-in-out"
+                        :style="'transform: translateX(-' + (currentSlide * 100) + '%)'">
+                        @foreach($featuredPosts->chunk(3) as $slideIndex => $slideGroup)
+                            <div class="w-full flex-shrink-0">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    @foreach($slideGroup as $post)
+                                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition group">
+                                            <div class="h-48 bg-gradient-to-br from-blue-100 to-blue-200 overflow-hidden">
+                                                @if($post->thumbnail)
+                                                    <img src="{{ $post->thumbnail }}" alt="{{ $post->title }}"
+                                                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                                @else
+                                                    <div class="w-full h-full flex items-center justify-center text-blue-400">
+                                                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="p-5">
+                                                <span
+                                                    class="text-sm text-blue-600 font-medium">{{ $post->type === 'event' ? 'Sự kiện' : 'Tin tức' }}</span>
+                                                <h3
+                                                    class="text-lg font-semibold text-gray-800 mt-2 group-hover:text-blue-600 transition line-clamp-2">
+                                                    <a href="{{ route('post.show', $post->slug) }}">{{ $post->title }}</a>
+                                                </h3>
+                                                <p class="text-gray-600 mt-2 text-sm line-clamp-2">{{ $post->excerpt }}</p>
+                                                <div class="flex items-center mt-4 text-sm text-gray-500">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                        </path>
+                                                    </svg>
+                                                    {{ $post->published_at?->format('d/m/Y') }}
+                                                </div>
+                                            </div>
+                                        </article>
+                                    @endforeach
                                 </div>
-                            @endif
-                        </div>
-                        <div class="p-5">
-                            <span
-                                class="text-sm text-blue-600 font-medium">{{ $post->type === 'event' ? 'Sự kiện' : 'Tin tức' }}</span>
-                            <h3 class="text-lg font-semibold text-gray-800 mt-2 group-hover:text-blue-600 transition line-clamp-2">
-                                <a href="{{ route('post.show', $post->slug) }}">{{ $post->title }}</a>
-                            </h3>
-                            <p class="text-gray-600 mt-2 text-sm line-clamp-2">{{ $post->excerpt }}</p>
-                            <div class="flex items-center mt-4 text-sm text-gray-500">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                                {{ $post->published_at?->format('d/m/Y') }}
                             </div>
-                        </div>
-                    </article>
-                @endforeach
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Navigation Arrows (only show if more than 3 posts) -->
+                @if($featuredPosts->count() > 3)
+                    <button @click="prev()"
+                        class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-lg rounded-full p-3 hover:bg-blue-50 transition z-10 hidden md:flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button @click="next()"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-lg rounded-full p-3 hover:bg-blue-50 transition z-10 hidden md:flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Navigation Dots -->
+                    <div class="flex justify-center mt-6 gap-2">
+                        @foreach($featuredPosts->chunk(3) as $slideIndex => $slideGroup)
+                            <button @click="goToSlide({{ $slideIndex }})"
+                                :class="currentSlide === {{ $slideIndex }} ? 'bg-blue-600 w-6' : 'bg-gray-300 hover:bg-gray-400'"
+                                class="h-2 rounded-full transition-all duration-300"></button>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </section>
+
+        <!-- Alpine.js Carousel Script -->
+        <script>
+            function featuredCarousel() {
+                return {
+                    currentSlide: 0,
+                    totalSlides: {{ ceil($featuredPosts->count() / 3) }},
+                    autoPlayInterval: null,
+
+                    init() {
+                        if (this.totalSlides > 1) {
+                            this.startAutoPlay();
+                        }
+                    },
+
+                    startAutoPlay() {
+                        this.autoPlayInterval = setInterval(() => {
+                            this.next();
+                        }, 5000); // Auto slide every 5 seconds
+                    },
+
+                    stopAutoPlay() {
+                        if (this.autoPlayInterval) {
+                            clearInterval(this.autoPlayInterval);
+                        }
+                    },
+
+                    next() {
+                        this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                    },
+
+                    prev() {
+                        this.currentSlide = this.currentSlide === 0 ? this.totalSlides - 1 : this.currentSlide - 1;
+                    },
+
+                    goToSlide(index) {
+                        this.currentSlide = index;
+                        this.stopAutoPlay();
+                        this.startAutoPlay();
+                    }
+                }
+            }
+        </script>
     @endif
 
     <!-- Latest News Section -->
@@ -186,7 +268,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     @php
                         $defaultDepts = [
-                            ['name' => 'Khoa Công nghệ Thông tin', 'icon' => '💻'],
+                            ['name' => 'Khoa Công nghệ số', 'icon' => '💻'],
                             ['name' => 'Khoa Cơ khí', 'icon' => '⚙️'],
                             ['name' => 'Khoa Điện - Điện tử', 'icon' => '⚡'],
                             ['name' => 'Khoa Xây dựng', 'icon' => '🏗️'],
