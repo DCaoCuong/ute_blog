@@ -8,10 +8,9 @@
         <div class="container mx-auto px-4 py-16">
             <div class="max-w-3xl">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    Chào mừng đến với UTE
+                    Chào mừng đến với Trường Đại học Sư phạm Kỹ thuật
                 </h1>
                 <p class="text-xl text-blue-100 mb-8">
-                    Trường Đại học Sư phạm Kỹ thuật - Đại học Đà Nẵng.
                     Nơi đào tạo nguồn nhân lực chất lượng cao cho công nghiệp hóa, hiện đại hóa đất nước.
                 </p>
                 <div class="flex flex-wrap gap-4">
@@ -50,7 +49,7 @@
                             <a href="#">Tiêu đề bài viết mẫu số {{ $i }}</a>
                         </h3>
                         <p class="text-gray-600 mt-2 text-sm line-clamp-2">
-                            Đây là nội dung tóm tắt của bài viết. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                            Đây là nội dung tóm tắt của bài viết. Đây là nội dung tóm tắt của bài viết.
                         </p>
                         <div class="flex items-center mt-4 text-sm text-gray-500">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
