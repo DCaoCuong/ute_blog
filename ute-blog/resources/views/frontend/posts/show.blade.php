@@ -333,7 +333,7 @@
             @endauth
 
             <!-- Comments List -->
-            <div class="space-y-6">
+            <div id="comment-list" class="space-y-6">
                 @forelse($post->comments as $comment)
                     <div class="flex gap-4">
                         <div class="flex-shrink-0">
@@ -370,9 +370,7 @@
                                         @endauth
                                     </div>
                                 </div>
-                                <div class="text-gray-700 text-sm whitespace-pre-wrap">
-                                    {{ $comment->content }}
-                                </div>
+                                <div class="text-gray-700 text-sm whitespace-pre-wrap">{{ $comment->content }}</div>
                             </div>
 
                             <!-- Edit Mode -->
@@ -405,7 +403,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-8 text-gray-500 italic">
+                    <div id="no-comments-message" class="text-center py-8 text-gray-500 italic">
                         Chưa có bình luận nào. Hãy là người đầu tiên bình luận >>
                     </div>
                 @endforelse
@@ -450,4 +448,111 @@
             </div>
         </section>
     @endif
+
+@push('scripts')
+{{-- Load Socket.io from a reliable CDN --}}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initializing Socket.io...');
+        
+        // Ensure io is defined
+        if (typeof io === 'undefined') {
+            console.error('Socket.io library not loaded!');
+            return;
+        }
+
+        const socket = io('http://localhost:3000', {
+            transports: ['websocket', 'polling'], // Allow fallback
+            reconnection: true
+        });
+
+        const postId = "{{ $post->id }}"; // Ensure string context for ID if needed, though unquoted works for ints
+        
+        // Debug connection status
+        socket.on('connect', () => {
+            console.log(' Connected to socket server with ID:', socket.id);
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('Connection failed:', err);
+        });
+
+        socket.on('new_comment', (data) => {
+            console.log(' New comment received:', data);
+            
+            // Check type equality loosely to handle string/int differences
+            if (data.post_id == postId) {
+                console.log(' Comment matches current post, appending...');
+                const commentList = document.getElementById('comment-list');
+                
+                if (!commentList) {
+                    console.error(' Could not find element with id "comment-list"');
+                    return;
+                }
+
+            
+            // XSS protection
+            const content = data.content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            // Render avatar based on data
+            let avatarHtml = '';
+            if (data.user_avatar) {
+                avatarHtml = `<img src="${data.user_avatar}" alt="${data.user_name}" class="w-10 h-10 rounded-full object-cover border border-gray-200">`;
+            } else {
+                const firstLetter = data.user_name ? data.user_name.charAt(0).toUpperCase() : 'A';
+                avatarHtml = `
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold border border-gray-200">
+                        ${firstLetter}
+                    </div>
+                `;
+            }
+
+            const newCommentHtml = `
+                <div class="flex gap-4 animate-pulse-once" id="comment-${data.id}">
+                    <div class="flex-shrink-0">
+                        ${avatarHtml}
+                    </div>
+                    <div class="flex-grow">
+                        <div class="bg-gray-50 p-3 rounded-2xl rounded-tl-none border border-gray-100 group relative">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="font-semibold text-gray-900 text-sm">
+                                    ${data.user_name}
+                                </h4>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500">Vừa xong</span>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 text-sm whitespace-pre-wrap">${content}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if(commentList) {
+               // Remove empty message if it exists
+               const emptyMsg = document.getElementById('no-comments-message');
+               if (emptyMsg) emptyMsg.remove();
+
+               // Create temporary container
+               const tempDiv = document.createElement('div');
+               tempDiv.innerHTML = newCommentHtml;
+               
+               // Append to list (at bottom)
+               commentList.appendChild(tempDiv.firstElementChild);
+            }
+        });
+    });
+</script>
+
+<style>
+    @keyframes highlight {
+        0% { background-color: #e0e7ff; }
+        100% { background-color: #f9fafb; }
+    }
+    .animate-pulse-once {
+        animation: highlight 2s ease-out;
+    }
+</style>
+@endpush
 @endsection

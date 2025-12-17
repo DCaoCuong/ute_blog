@@ -32,6 +32,21 @@ class CommentController extends Controller
 
         $comment->save();
 
+        // Notify Node.js server
+        try {
+            \Illuminate\Support\Facades\Http::post('http://localhost:3000/api/comments/notify', [
+                'id' => $comment->id,
+                'post_id' => $comment->post_id,
+                'user_name' => $comment->user->name,
+                'user_avatar' => $comment->user->profile_photo_url ?? null, // Taking a guess at avatar, or just use name
+                'content' => $comment->content,
+                'created_at' => $comment->created_at->format('d M Y, h:i A'),
+            ]);
+        } catch (\Exception $e) {
+            // Log error or ignore if socket server is down
+            // \Log::error('Socket server error: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('success', 'Bình luận của bạn đã được gửi thành công!');
     }
     /**
