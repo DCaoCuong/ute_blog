@@ -272,6 +272,159 @@
         </div>
     </article>
 
+    <!-- Comments Section -->
+    <section class="bg-white py-8 border-t border-gray-200">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Bình luận ({{ $post->comments->count() }})</h2>
+
+            <!-- Flash Messages -->
+            @if(session('success'))
+                <div class="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 flex items-center shadow-sm" role="alert">
+                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+
+            <!-- Comment Form -->
+            @auth
+                <div class="mb-10 p-6 bg-gray-50 rounded-xl border border-gray-100">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}"
+                                    class="w-10 h-10 rounded-full object-cover border border-gray-200">
+                            @else
+                                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200">
+                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-grow">
+                            <form action="{{ route('comments.store', $post->id) }}" method="POST">
+                                @csrf
+                                <div class="mb-4">
+                                    <label for="content" class="sr-only">Nội dung bình luận</label>
+                                    <textarea name="content" id="content" rows="3"
+                                        class="w-full px-4 py-3 rounded-lg border {{ $errors->has('content') ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500' }} focus:ring-2 transition resize-none"
+                                        placeholder="Comment nào ... .>>>" required></textarea>
+                                    @error('content')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit"
+                                        class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">
+                                        Gửi bình luận
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="mb-10 p-6 bg-blue-50 rounded-xl border border-blue-100 text-center">
+                    <p class="text-blue-800 mb-3">Vui lòng đăng nhập để bình luận.</p>
+                    <a href="{{ route('login') }}" class="inline-block px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">
+                        Đăng nhập ngay
+                    </a>
+                </div>
+            @endauth
+
+            <!-- Comments List -->
+            <div class="space-y-6">
+                @forelse($post->comments as $comment)
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0">
+                            @if($comment->user && $comment->user->avatar)
+                                <img src="{{ $comment->user->avatar }}" alt="{{ $comment->user->name }}"
+                                    class="w-10 h-10 rounded-full object-cover border border-gray-200">
+                            @elseif($comment->user)
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold border border-gray-200">
+                                    {{ substr($comment->user->name, 0, 1) }}
+                                </div>
+                            @else
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-gray-200">
+                                    <svg class="w-6 h-6" fill="fill" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-grow">
+                            <!-- View Mode -->
+                            <div id="comment-view-{{ $comment->id }}" class="bg-gray-50 p-3 rounded-2xl rounded-tl-none border border-gray-100 group relative">
+                                <div class="flex items-center justify-between mb-1">
+                                    <h4 class="font-semibold text-gray-900 text-sm">
+                                        {{ $comment->user ? $comment->user->name : 'Người dùng ẩn danh' }}
+                                    </h4>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                        @auth
+                                            @if(auth()->id() === $comment->user_id)
+                                                <button onclick="toggleEdit('{{ $comment->id }}')" class="text-xs text-blue-600 hover:text-blue-800 font-medium ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    Sửa
+                                                </button>
+                                            @endif
+                                        @endauth
+                                    </div>
+                                </div>
+                                <div class="text-gray-700 text-sm whitespace-pre-wrap">
+                                    {{ $comment->content }}
+                                </div>
+                            </div>
+
+                            <!-- Edit Mode -->
+                            @auth
+                                @if(auth()->id() === $comment->user_id)
+                                    <div id="comment-edit-{{ $comment->id }}" class="hidden">
+                                        <form action="{{ route('comments.update', $comment->id) }}" method="POST" class="bg-white p-4 rounded-2xl border border-blue-200 shadow-sm">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="mb-3">
+                                                <label for="content-{{ $comment->id }}" class="sr-only">Nội dung</label>
+                                                <textarea name="content" id="content-{{ $comment->id }}" rows="3"
+                                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 focus:ring-2 transition resize-none"
+                                                    required>{{ $comment->content }}</textarea>
+                                            </div>
+                                            <div class="flex justify-end gap-2">
+                                                <button type="button" onclick="toggleEdit('{{ $comment->id }}')"
+                                                    class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm transition">
+                                                    Hủy
+                                                </button>
+                                                <button type="submit"
+                                                    class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 text-sm transition shadow-sm">
+                                                    Cập nhật
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endauth
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8 text-gray-500 italic">
+                        Chưa có bình luận nào. Hãy là người đầu tiên bình luận >>
+                    </div>
+                @endforelse
+            </div>
+
+            <script>
+                function toggleEdit(commentId) {
+                    const viewEl = document.getElementById(`comment-view-${commentId}`);
+                    const editEl = document.getElementById(`comment-edit-${commentId}`);
+                    
+                    if (viewEl && editEl) {
+                        viewEl.classList.toggle('hidden');
+                        editEl.classList.toggle('hidden');
+                    }
+                }
+            </script>
+        </div>
+    </section>
+
     <!-- Related Posts -->
     @if($relatedPosts->count() > 0)
         <section class="bg-gray-50 py-12">

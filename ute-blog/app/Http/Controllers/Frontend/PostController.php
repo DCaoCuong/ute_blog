@@ -60,7 +60,14 @@ class PostController extends Controller
      */
     public function show(string $slug)
     {
-        $post = Post::published()->where('slug', $slug)->firstOrFail();
+        $post = Post::published()->where('slug', $slug)
+            ->with([
+                'comments' => function ($query) {
+                    $query->approved()->orderBy('created_at', 'desc');
+                },
+                'comments.user'
+            ])
+            ->firstOrFail();
 
         // Increment view count
         $post->incrementViews();

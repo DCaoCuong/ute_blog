@@ -61,6 +61,10 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Comments
+    Route::post('/bai-viet/{post}/comment', [\App\Http\Controllers\Frontend\CommentController::class, 'store'])->name('comments.store');
+    Route::put('/comments/{comment}', [\App\Http\Controllers\Frontend\CommentController::class, 'update'])->name('comments.update');
 });
 
 // ===== SHARED ADMIN ROUTES (Both Admin & Content Manager) =====
