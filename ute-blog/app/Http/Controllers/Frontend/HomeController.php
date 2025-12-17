@@ -20,7 +20,7 @@ class HomeController extends Controller
                     ->orWhere('is_pinned', true);
             })
             ->orderBy('published_at', 'desc')
-            ->take(3)
+            ->take(9)
             ->get();
 
         // Latest news
